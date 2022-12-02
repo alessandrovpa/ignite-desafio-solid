@@ -1,0 +1,244 @@
+{
+  "openapi": "3.0.0",
+  "info":{
+    "title": "Desafio Swagger RocketSeat",
+    "description": "Essa é a documentação da API do desafio da rocketseat",
+    "version": "1.0.0",
+    "contact":{
+      "email":"alessandrovictor159@gmail.com"
+    }
+  },
+  "components":{
+    "schemas":{
+      "User":{
+        "type": "object",
+        "required": ["email", "name"],
+        "properties": {
+          "id":{
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "name":{
+            "type": "string"
+          },
+          "email":{
+            "type": "string",
+            "format": "email"
+          },
+          "admin":{
+            "type": "boolean",
+            "readOnly": true
+          },
+          "created_at":{
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "updated_at":{
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          }
+        },
+        "example": {
+          "id": "9d34335b-f5c8-40a1-ae4a-58922898efb8",
+          "name": "Alessandro Victor",
+          "email": "alessandrovictor159@gmail.com",
+          "created_at": "2022-11-30T20:07:17.991Z",
+          "updated_at": "2022-11-30T20:07:17.991Z"
+        }
+      },
+      "Error":{
+        "type": "object",
+        "properties":{
+          "error":{
+            "type":"string",
+            "readOnly": true
+          }
+        },
+        "example":{
+          "error": "Descrição do error"
+        }
+      }
+    }
+  },
+  "paths":{
+    "/users":{
+      "post":{
+        "tags": ["User"],
+        "summary": "Cadastro de usuário",
+        "description": "Rota para cadastrar um novo usuário",
+        "parameters":[{
+          "name": "name",
+          "in": "body",
+          "description": "Nome do usuário a ser criado",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }, {
+          "name": "email",
+          "in": "body",
+          "description": "Email do usuário a ser criado",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "email"
+          }
+        }],
+        "requestBody":{
+          "description": "Usuário a ser criado",
+          "required": true,
+          "content":{
+            "application/json":{
+              "schema":{
+                "$ref": "#/components/schemas/User"
+              },
+              "example":{
+                "name": "Alessandro Victor",
+                "email": "alessandrovictor159@gmail.com"
+              }
+            }
+          }
+        },
+        "responses":{
+          "201":{
+            "description": "Created",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400":{
+            "description": "Email já cadastrado",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get":{
+        "tags": ["User"],
+        "summary": "Listagem de usuários",
+        "description" : "Somente um usuário ADMIN pode acessar",
+        "parameters":[{
+          "name": "user_id",
+          "in": "header",
+          "description": "ID de um usuário admin",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }],
+        "responses":{
+          "200":{
+            "content":{
+              "application/json":{
+                "schema":{
+                  "type":"array",
+                  "items":{
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "400":{
+            "description": "Usuário sem permissão de listagem de usuários",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{user_id}":{
+      "get":{
+        "tags": ["User"],
+        "summary": "Informação de um usuário",
+        "description" : "Retorna as informações do usuário informado",
+        "parameters":[{
+          "name": "user_id",
+          "in": "path",
+          "description": "ID do usuário a ser procurado",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }],
+        "responses":{
+          "200":{
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "404":{
+            "description": "Usuário não encontrado",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{user_id}/admin":{
+      "patch":{
+        "tags": ["User"],
+        "summary": "Promover um usuário",
+        "description": "Promove o enviado em um administrador",
+        "parameters":[{
+          "name":"user_id",
+          "in":"path",
+          "description": "ID do usuário a ser promovido a administrador",
+          "required": true,
+          "schema":{
+            "type": "string",
+            "format": "uuid"
+          }
+        }],
+        "responses":{
+          "200":{
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "404":{
+            "description": "Usuário não encontrado",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
